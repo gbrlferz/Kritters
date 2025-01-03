@@ -1,0 +1,8 @@
+BasedOnStyle: Google
+UseTab: Never
+ColumnLimit: 140
+BreakBeforeBraces: Attach
+AllowShortFunctionsOnASingleLine: InlineOnly
+PointerAlignment: Left
+IncludeBlocks: Preserve
+SortIncludes: true
