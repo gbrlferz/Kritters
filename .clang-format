@@ -3,6 +3,7 @@ UseTab: Never
 ColumnLimit: 140
 BreakBeforeBraces: Attach
 AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortBlocksOnASingleLine: true
 PointerAlignment: Left
 IncludeBlocks: Preserve
 SortIncludes: true

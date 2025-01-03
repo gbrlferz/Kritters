@@ -1,41 +1,46 @@
-#include <math.h>  // Required for: sinf(), cosf()
+#include <math.h>
 #include <fstream>
 #include <string>
 #include <vector>
+#include "include/cursor.h"
 #include "include/raylib.h"
 
-struct Cursor {
- public:
-  Vector2 position;
-  Vector2 size;
-  // Constructor
-  Cursor(Vector2 pos, Vector2 sz) : position(pos), size(sz) {}
-};
+float tile_size = 16;
 
 std::vector<std::string> tileMap;
 
+Cursor cursor = Cursor({0, 0}, {tile_size - 1, tile_size - 1});
+
+struct Krit {
+ public:
+  Vector2 position;
+  Vector2 size;
+  Color color;
+  // Constructor
+  Krit(Vector2 pos, Vector2 sz, Color clr) : position(pos), size(sz), color(clr){}
+};
+
 int main(void) {
+  // INITIALIZATION
+
   std::ifstream file("resources/level.txt");
   std::string str;
-  while (std::getline(file, str)) {
-    tileMap.push_back(str);
-  };
+  while (std::getline(file, str)) { tileMap.push_back(str); };
+
   // Calculate map dimensions
   int MAP_ROWS = tileMap.size();
   int MAP_COLS = tileMap[0].size();
 
-  // INITIALIZATION
-  const int screenWidth = 1920;
-  const int screenHeight = 1080;
+  const int screenWidth = 1280;
+  const int screenHeight = 720;
 
   const int virtualScreenWidth = 320;
   const int virtualScreenHeight = 180;
 
-  // GRID
-  float tile_size = 12;
-  Vector2 grid_offset = {5, 8};
+  std::vector<Krit> krits;
 
-  Cursor cursor = Cursor({0, 0}, {tile_size - 1, tile_size - 1});
+  // GRID
+  Vector2 grid_offset = {5, 8};
 
   bool debug = false;
 
@@ -63,31 +68,21 @@ int main(void) {
     // UPDATE
     time += GetFrameTime();
 
-    if (IsKeyPressed(KEY_GRAVE)) {
-      debug = !debug;
-    }
+    if (IsKeyPressed(KEY_GRAVE)) { debug = !debug; }
 
-    if (IsKeyPressed(KEY_DOWN) && cursor.position.y < MAP_ROWS - 1) {
-      if (tileMap[cursor.position.y + 1][cursor.position.x] != '#') {  // Swap x and y
-        cursor.position.y++;
-      }
+    // Movement
+    if (IsKeyPressed(KEY_DOWN)) {
+      if (tileMap[cursor.position.y + 1][cursor.position.x] == '.') { cursor.position.y++; }
     }
-    if (IsKeyPressed(KEY_UP) && cursor.position.y > 0) {
-      if (tileMap[cursor.position.y - 1][cursor.position.x] != '#') {  // Swap x and y
-        cursor.position.y--;
-      }
+    if (IsKeyPressed(KEY_UP)) {
+      if (tileMap[cursor.position.y - 1][cursor.position.x] == '.') { cursor.position.y--; }
     }
-    if (IsKeyPressed(KEY_RIGHT) && cursor.position.x < MAP_COLS - 1) {
-      if (tileMap[cursor.position.y][cursor.position.x + 1] != '#') {  // Swap x and y
-        cursor.position.x++;
-      }
+    if (IsKeyPressed(KEY_RIGHT)) {
+      if (tileMap[cursor.position.y][cursor.position.x + 1] == '.') { cursor.position.x++; }
     }
-    if (IsKeyPressed(KEY_LEFT) && cursor.position.x > 0) {
-      if (tileMap[cursor.position.y][cursor.position.x - 1] != '#') {  // Swap x and y
-        cursor.position.x--;
-      }
+    if (IsKeyPressed(KEY_LEFT)) {
+      if (tileMap[cursor.position.y][cursor.position.x - 1] == '.') { cursor.position.x--; }
     }
-
     // DRAW
     BeginTextureMode(target);
     ClearBackground(RAYWHITE);
