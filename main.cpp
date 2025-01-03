@@ -1,4 +1,5 @@
 #include <math.h>
+#include <cstddef>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -9,7 +10,7 @@ float tile_size = 16;
 
 std::vector<std::string> tileMap;
 
-Cursor cursor = Cursor({0, 0}, {tile_size - 1, tile_size - 1});
+Cursor cursor = Cursor({4, 4}, {tile_size - 1, tile_size - 1});
 
 struct Krit {
  public:
@@ -17,12 +18,11 @@ struct Krit {
   Vector2 size;
   Color color;
   // Constructor
-  Krit(Vector2 pos, Vector2 sz, Color clr) : position(pos), size(sz), color(clr){}
+  Krit(Vector2 pos, Vector2 sz, Color clr) : position(pos), size(sz), color(clr) {}
 };
 
 int main(void) {
   // INITIALIZATION
-
   std::ifstream file("resources/level.txt");
   std::string str;
   while (std::getline(file, str)) { tileMap.push_back(str); };
@@ -31,13 +31,13 @@ int main(void) {
   int MAP_ROWS = tileMap.size();
   int MAP_COLS = tileMap[0].size();
 
-  const int screenWidth = 1280;
-  const int screenHeight = 720;
+  const int screenWidth = 1920;
+  const int screenHeight = 1080;
 
   const int virtualScreenWidth = 320;
   const int virtualScreenHeight = 180;
 
-  std::vector<Krit> krits;
+  std::vector<Krit> krits{Krit({2, 2}, {tile_size - 1, tile_size}, GREEN)};
 
   // GRID
   Vector2 grid_offset = {5, 8};
@@ -45,6 +45,8 @@ int main(void) {
   bool debug = false;
 
   const float virtualRatio = (float)screenWidth / (float)virtualScreenWidth;
+
+  SetConfigFlags(FLAG_FULLSCREEN_MODE);
 
   InitWindow(screenWidth, screenHeight, "Krazy Kreatures");
 
@@ -63,26 +65,41 @@ int main(void) {
 
   SetTargetFPS(60);
 
+  bool selected = false;
+
   // MAIN GAME LOOP
   while (!WindowShouldClose()) {  // Detect window close button or ESC key
     // UPDATE
     time += GetFrameTime();
 
+    if (IsKeyPressed(KEY_Z)) {
+      if (selected) {
+        selected = false;
+      } else {
+        for (size_t k = 0; k < krits.size(); k++) {
+          if (cursor.position.x == krits[k].position.x && cursor.position.y == krits[k].position.y) { selected = true; };
+        }
+      }
+    }
+
+    if (selected) { krits[0].position = cursor.position; }
+
     if (IsKeyPressed(KEY_GRAVE)) { debug = !debug; }
 
     // Movement
-    if (IsKeyPressed(KEY_DOWN)) {
-      if (tileMap[cursor.position.y + 1][cursor.position.x] == '.') { cursor.position.y++; }
-    }
     if (IsKeyPressed(KEY_UP)) {
-      if (tileMap[cursor.position.y - 1][cursor.position.x] == '.') { cursor.position.y--; }
+      if (cursor.position.y > 0 && tileMap[cursor.position.y - 1][cursor.position.x] == '.') { cursor.position.y--; }
     }
-    if (IsKeyPressed(KEY_RIGHT)) {
-      if (tileMap[cursor.position.y][cursor.position.x + 1] == '.') { cursor.position.x++; }
+    if (IsKeyPressed(KEY_DOWN)) {
+      if (cursor.position.y < MAP_ROWS - 1 && tileMap[cursor.position.y + 1][cursor.position.x] == '.') { cursor.position.y++; }
     }
     if (IsKeyPressed(KEY_LEFT)) {
-      if (tileMap[cursor.position.y][cursor.position.x - 1] == '.') { cursor.position.x--; }
+      if (cursor.position.x > 0 && tileMap[cursor.position.y][cursor.position.x - 1] == '.') { cursor.position.x--; }
     }
+    if (IsKeyPressed(KEY_RIGHT)) {
+      if (cursor.position.x < MAP_COLS - 1 && tileMap[cursor.position.y][cursor.position.x + 1] == '.') { cursor.position.x++; }
+    }
+
     // DRAW
     BeginTextureMode(target);
     ClearBackground(RAYWHITE);
@@ -101,6 +118,12 @@ int main(void) {
             break;
         }
       }
+    }
+
+    for (size_t k = 0; k < krits.size(); k++) {
+      Krit krit = krits[k];
+      Vector2 position = {krit.position.x * tile_size + grid_offset.x, krit.position.y * tile_size + grid_offset.y};
+      DrawRectangle(position.x, position.y, krit.size.x, krit.size.y - 1, krit.color);
     }
 
     Rectangle cursorRec = {cursor.position.x * tile_size + grid_offset.x, cursor.position.y * tile_size + grid_offset.y, cursor.size.x,
