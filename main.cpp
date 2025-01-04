@@ -6,9 +6,11 @@
 #include "include/cursor.h"
 #include "include/raylib.h"
 
+using namespace std;
+
 float tile_size = 16;
 
-std::vector<std::string> tileMap;
+vector<string> tileMap;
 
 Cursor cursor = Cursor({4, 4}, {tile_size - 1, tile_size - 1});
 
@@ -23,21 +25,21 @@ struct Krit {
 
 int main(void) {
   // INITIALIZATION
-  std::ifstream file("resources/level.txt");
-  std::string str;
-  while (std::getline(file, str)) { tileMap.push_back(str); };
+  ifstream file("resources/level.txt");
+  string str;
+  while (getline(file, str)) { tileMap.push_back(str); };
 
   // Calculate map dimensions
   int MAP_ROWS = tileMap.size();
   int MAP_COLS = tileMap[0].size();
 
-  const int screenWidth = 1920;
-  const int screenHeight = 1080;
+  const int screenWidth = 1280;
+  const int screenHeight = 720;
 
   const int virtualScreenWidth = 320;
   const int virtualScreenHeight = 180;
 
-  std::vector<Krit> krits{Krit({2, 2}, {tile_size - 1, tile_size}, GREEN)};
+  vector<Krit> krits{Krit({2, 2}, {tile_size - 1, tile_size}, GREEN)};
 
   // GRID
   Vector2 grid_offset = {5, 8};
@@ -45,8 +47,6 @@ int main(void) {
   bool debug = false;
 
   const float virtualRatio = (float)screenWidth / (float)virtualScreenWidth;
-
-  SetConfigFlags(FLAG_FULLSCREEN_MODE);
 
   InitWindow(screenWidth, screenHeight, "Krazy Kreatures");
 
@@ -65,26 +65,18 @@ int main(void) {
 
   SetTargetFPS(60);
 
-  bool selected = false;
+  Krit* currentKrit = nullptr;
 
   // MAIN GAME LOOP
-  while (!WindowShouldClose()) {  // Detect window close button or ESC key
+  while (!WindowShouldClose()) {
     // UPDATE
     time += GetFrameTime();
 
-    if (IsKeyPressed(KEY_Z)) {
-      if (selected) {
-        selected = false;
-      } else {
-        for (size_t k = 0; k < krits.size(); k++) {
-          if (cursor.position.x == krits[k].position.x && cursor.position.y == krits[k].position.y) { selected = true; };
-        }
-      }
-    }
-
-    if (selected) { krits[0].position = cursor.position; }
+    if (currentKrit) { currentKrit->position = cursor.position; }
 
     if (IsKeyPressed(KEY_GRAVE)) { debug = !debug; }
+
+    // GAMEPLAY
 
     // Movement
     if (IsKeyPressed(KEY_UP)) {
@@ -98,6 +90,19 @@ int main(void) {
     }
     if (IsKeyPressed(KEY_RIGHT)) {
       if (cursor.position.x < MAP_COLS - 1 && tileMap[cursor.position.y][cursor.position.x + 1] == '.') { cursor.position.x++; }
+    }
+
+    // Selection
+    if (IsKeyPressed(KEY_Z)) {
+      if (currentKrit) {
+        currentKrit = nullptr;
+      } else {
+        for (size_t k = 0; k < krits.size(); k++) {
+          if (cursor.position.x == krits[k].position.x && cursor.position.y == krits[k].position.y) { 
+            currentKrit = &krits[k];
+          };
+        }
+      }
     }
 
     // DRAW
@@ -126,8 +131,12 @@ int main(void) {
       DrawRectangle(position.x, position.y, krit.size.x, krit.size.y - 1, krit.color);
     }
 
-    Rectangle cursorRec = {cursor.position.x * tile_size + grid_offset.x, cursor.position.y * tile_size + grid_offset.y, cursor.size.x,
-                           cursor.size.y};
+    Rectangle cursorRec = {cursor.position.x * tile_size + grid_offset.x,
+                           cursor.position.y * tile_size + grid_offset.y,
+                           cursor.size.x,
+                           cursor.size.y
+    };
+
     DrawRectangleRoundedLinesEx(cursorRec, 0.1f, 16.0f, 1.0f + fabs(sin(time * 5.0f)), RED);
 
     EndMode2D();
