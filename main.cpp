@@ -1,5 +1,6 @@
 #include <math.h>
 #include <cstddef>
+#include <cstdlib>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -23,6 +24,31 @@ struct Krit {
   Krit(Vector2 pos, Color clr) : position(pos), color(clr) {}
 };
 
+vector<Krit> krits;
+
+bool TileEmpty(int x, int y) {
+  for (const auto& krit : krits) {
+    if (x == krit.position.x && y == krit.position.y) { return false; }
+  }
+  return true;
+}
+
+void CreateRandomKrit() {
+  while (true) {
+    // Get random tile
+    int x = rand() % tileMap[0].size();
+    int y = rand() % tileMap.size();
+    if (TileEmpty(x,  y)) {
+      krits.push_back(Krit({static_cast<float>(x), static_cast<float>(y)}, MAROON));
+      break;
+    }
+  }
+}
+
+void PopulateMapWithKrits(int amount) {
+  for (int i = 0; i < amount; i++) { CreateRandomKrit(); }
+}
+
 int main(void) {
   // INITIALIZATION
   ifstream file("resources/level.txt");
@@ -38,8 +64,6 @@ int main(void) {
 
   const int virtualScreenWidth = 320;
   const int virtualScreenHeight = 180;
-
-  vector<Krit> krits;
 
   // GRID
   Vector2 grid_offset = {5, 8};
@@ -67,12 +91,7 @@ int main(void) {
 
   Krit* currentKrit = nullptr;
 
-  // Sort through all the map
-  for (int w = 0; w < MAP_ROWS; w++) {
-    for (int h = 0; h < MAP_COLS; h++) {
-      if (rand() % 101 < 25 && tileMap[w][h] == '.') { krits.push_back(Krit({static_cast<float>(h), static_cast<float>(w)}, MAROON)); }
-    }
-  }
+  PopulateMapWithKrits(10);
 
   // MAIN GAME LOOP
   while (!WindowShouldClose()) {
@@ -82,6 +101,7 @@ int main(void) {
     if (currentKrit) { currentKrit->position = cursor.position; }
 
     if (IsKeyPressed(KEY_GRAVE)) { debug = !debug; }
+    if (IsKeyPressed(KEY_K)) { CreateRandomKrit(); }
 
     // GAMEPLAY
 
