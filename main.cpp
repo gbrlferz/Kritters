@@ -17,10 +17,10 @@ Cursor cursor = Cursor({4, 4}, {tile_size - 1, tile_size - 1});
 struct Krit {
  public:
   Vector2 position;
-  Vector2 size;
+  Vector2 size = {tile_size - 1, tile_size};
   Color color;
   // Constructor
-  Krit(Vector2 pos, Vector2 sz, Color clr) : position(pos), size(sz), color(clr) {}
+  Krit(Vector2 pos, Color clr) : position(pos), color(clr) {}
 };
 
 int main(void) {
@@ -39,7 +39,7 @@ int main(void) {
   const int virtualScreenWidth = 320;
   const int virtualScreenHeight = 180;
 
-  vector<Krit> krits{Krit({2, 2}, {tile_size - 1, tile_size}, GREEN)};
+  vector<Krit> krits;
 
   // GRID
   Vector2 grid_offset = {5, 8};
@@ -66,6 +66,13 @@ int main(void) {
   SetTargetFPS(60);
 
   Krit* currentKrit = nullptr;
+
+  // Sort through all the map
+  for (int w = 0; w < MAP_ROWS; w++) {
+    for (int h = 0; h < MAP_COLS; h++) {
+      if (rand() % 101 < 25 && tileMap[w][h] == '.') { krits.push_back(Krit({static_cast<float>(h), static_cast<float>(w)}, MAROON)); }
+    }
+  }
 
   // MAIN GAME LOOP
   while (!WindowShouldClose()) {
@@ -116,10 +123,10 @@ int main(void) {
         char tile = tileMap[w][h];
         switch (tile) {
           case '.':
-            DrawRectangle(position.x, position.y, tile_size - 1, tile_size - 1, BLUE);
+            DrawRectangle(position.x, position.y, tile_size - 1, tile_size - 1, LIGHTGRAY);
             break;
           case '#':
-            DrawRectangle(position.x, position.y, tile_size - 1, tile_size - 1, BLACK);
+            DrawRectangle(position.x, position.y, tile_size - 1, tile_size - 1, DARKGRAY);
             break;
         }
       }
