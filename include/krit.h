@@ -1,8 +1,8 @@
 #ifndef KRIT_H
 #define KRIT_H
 
-#include "raylib.h"
 #include <vector>
+#include "raylib.h"
 
 struct Krit {
   Vector2 position;

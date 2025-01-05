@@ -7,6 +7,7 @@
 #include "include/krit.h"
 #include "include/map.h"
 #include "include/raylib.h"
+#include "include/globals.h"
 
 using namespace std;
 
@@ -15,6 +16,8 @@ float tile_size = 16;
 vector<string> tileMap;
 
 Cursor cursor = Cursor({4, 4}, {tile_size - 1, tile_size - 1});
+
+Krit* currentKrit = nullptr;
 
 int main(void) {
   // INITIALIZATION
@@ -26,10 +29,13 @@ int main(void) {
   int MAP_ROWS = tileMap.size();
   int MAP_COLS = tileMap[0].size();
 
-  const int screenWidth = 1280;
+  // Screen
+  const float ratio = 4.0 / 3.0;
+
+  const int screenWidth = 720 * ratio;
   const int screenHeight = 720;
 
-  const int virtualScreenWidth = 320;
+  const int virtualScreenWidth = 180 * ratio;
   const int virtualScreenHeight = 180;
 
   // GRID
@@ -56,8 +62,6 @@ int main(void) {
   float spawnTime = 0.0f;
 
   SetTargetFPS(60);
-
-  Krit* currentKrit = nullptr;
 
   PopulateMapWithKrits(10);
 
@@ -94,7 +98,7 @@ int main(void) {
 
     // Selection
     if (IsKeyPressed(KEY_Z)) {
-      if (currentKrit) {
+      if (currentKrit && TileEmpty(cursor.position.x, cursor.position.y)) {
         currentKrit = nullptr;
       } else {
         for (size_t k = 0; k < krits.size(); k++) {

@@ -2,16 +2,17 @@
 #include "include/raylib.h"
 #include "include/krit.h"
 #include "include/map.h"
+#include "include/globals.h"
 using namespace std;
 
 vector<Krit> krits;
 
 bool TileEmpty(int x, int y) {
+  if (tileMap[y][x] != '.') { return false; } // Return false if space is not empty
+
   for (const auto& krit : krits) {
-    // Return false if space is not empty
-    if (tileMap[y][x] != '.') { return false; }
     // Return false if a krit is already there
-    if (x == krit.position.x && y == krit.position.y) { return false; }
+    if (&krit != currentKrit && x == krit.position.x && y == krit.position.y) { return false; }
   }
   return true;
 }
