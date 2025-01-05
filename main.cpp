@@ -3,8 +3,9 @@
 #include <cstdlib>
 #include <fstream>
 #include <string>
-#include <vector>
 #include "include/cursor.h"
+#include "include/krit.h"
+#include "include/map.h"
 #include "include/raylib.h"
 
 using namespace std;
@@ -14,40 +15,6 @@ float tile_size = 16;
 vector<string> tileMap;
 
 Cursor cursor = Cursor({4, 4}, {tile_size - 1, tile_size - 1});
-
-struct Krit {
- public:
-  Vector2 position;
-  Vector2 size = {tile_size - 1, tile_size};
-  Color color;
-  // Constructor
-  Krit(Vector2 pos, Color clr) : position(pos), color(clr) {}
-};
-
-vector<Krit> krits;
-
-bool TileEmpty(int x, int y) {
-  for (const auto& krit : krits) {
-    if (x == krit.position.x && y == krit.position.y) { return false; }
-  }
-  return true;
-}
-
-void CreateRandomKrit() {
-  while (true) {
-    // Get random tile
-    int x = rand() % tileMap[0].size();
-    int y = rand() % tileMap.size();
-    if (TileEmpty(x,  y)) {
-      krits.push_back(Krit({static_cast<float>(x), static_cast<float>(y)}, MAROON));
-      break;
-    }
-  }
-}
-
-void PopulateMapWithKrits(int amount) {
-  for (int i = 0; i < amount; i++) { CreateRandomKrit(); }
-}
 
 int main(void) {
   // INITIALIZATION
@@ -85,7 +52,8 @@ int main(void) {
 
   Vector2 origin = {0.0f, 0.0f};
 
-  float time = 0.0f;
+  float dt = 0.0f;
+  float spawnTime = 0.0f;
 
   SetTargetFPS(60);
 
@@ -96,12 +64,17 @@ int main(void) {
   // MAIN GAME LOOP
   while (!WindowShouldClose()) {
     // UPDATE
-    time += GetFrameTime();
+    dt += GetFrameTime();
+    spawnTime += GetFrameTime();
 
     if (currentKrit) { currentKrit->position = cursor.position; }
 
     if (IsKeyPressed(KEY_GRAVE)) { debug = !debug; }
-    if (IsKeyPressed(KEY_K)) { CreateRandomKrit(); }
+
+    if (spawnTime >= 1.0f) {
+      CreateRandomKrit();
+      spawnTime = 0.0f;
+    }
 
     // GAMEPLAY
 
@@ -164,7 +137,7 @@ int main(void) {
                            cursor.size.y
     };
 
-    DrawRectangleRoundedLinesEx(cursorRec, 0.1f, 16.0f, 1.0f + fabs(sin(time * 5.0f)), RED);
+    DrawRectangleRoundedLinesEx(cursorRec, 0.1f, 16.0f, 1.0f + fabs(sin(dt * 5.0f)), RED);
 
     EndMode2D();
     EndTextureMode();
