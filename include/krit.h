@@ -17,5 +17,7 @@ extern std::vector<Krit> krits;
 bool TileEmpty(int x, int y);
 void CreateRandomKrit();
 void PopulateMapWithKrits(int amount);
+void DeleteKrit(int x, int y);
+bool CheckKrit(int x, int y);
 
 #endif

@@ -11,16 +11,29 @@
 
 using namespace std;
 
+bool debug = false;
 float tile_size = 16;
-
 vector<string> tileMap;
-
+Krit* currentKrit = nullptr;
 Cursor cursor = Cursor({4, 4}, {tile_size - 1, tile_size - 1});
 
-Krit* currentKrit = nullptr;
+void CheckPattern() {
+  // TODO: Check for any direction
+  int count = 0;
+  for (int i = 0; i < INFINITY; i++) {
+    if (CheckKrit(cursor.position.x + i, cursor.position.y)) {
+      count++;
+    } else {
+      break;
+    }
+  }
+  if (count >= 3) {
+    for (int i = 0; i < count; i++) { DeleteKrit(cursor.position.x + i, cursor.position.y); }
+  }
+}
 
 int main(void) {
-  // INITIALIZATION
+  // INITIALIZATION //
   ifstream file("resources/level.txt");
   string str;
   while (getline(file, str)) { tileMap.push_back(str); };
@@ -37,11 +50,6 @@ int main(void) {
 
   const int virtualScreenWidth = 180 * ratio;
   const int virtualScreenHeight = 180;
-
-  // GRID
-  Vector2 grid_offset = {5, 8};
-
-  bool debug = false;
 
   const float virtualRatio = (float)screenWidth / (float)virtualScreenWidth;
 
@@ -65,22 +73,22 @@ int main(void) {
 
   PopulateMapWithKrits(10);
 
-  // MAIN GAME LOOP
+  Vector2 grid_offset = {5, 8};
+
+  // MAIN GAME LOOP //
   while (!WindowShouldClose()) {
-    // UPDATE
+    // UPDATE //
     dt += GetFrameTime();
     spawnTime += GetFrameTime();
-
-    if (currentKrit) { currentKrit->position = cursor.position; }
-
-    if (IsKeyPressed(KEY_GRAVE)) { debug = !debug; }
 
     if (spawnTime >= 1.0f) {
       CreateRandomKrit();
       spawnTime = 0.0f;
     }
 
-    // GAMEPLAY
+    if (currentKrit) { currentKrit->position = cursor.position; }
+
+    // GAMEPLAY //
 
     // Movement
     if (IsKeyPressed(KEY_UP)) {
@@ -98,16 +106,20 @@ int main(void) {
 
     // Selection
     if (IsKeyPressed(KEY_Z)) {
+      // Deselect krit
       if (currentKrit && TileEmpty(cursor.position.x, cursor.position.y)) {
         currentKrit = nullptr;
-      } else {
+        CheckPattern();
+      }
+      // Select krit
+      else {
         for (size_t k = 0; k < krits.size(); k++) {
-          if (cursor.position.x == krits[k].position.x && cursor.position.y == krits[k].position.y) { 
-            currentKrit = &krits[k];
-          };
+          if (cursor.position.x == krits[k].position.x && cursor.position.y == krits[k].position.y) { currentKrit = &krits[k]; };
         }
       }
     }
+
+    if (IsKeyPressed(KEY_GRAVE)) { debug = !debug; }
 
     // DRAW
     BeginTextureMode(target);

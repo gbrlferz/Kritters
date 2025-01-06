@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <vector>
 #include "include/raylib.h"
 #include "include/krit.h"
@@ -30,4 +31,17 @@ void CreateRandomKrit() {
 
 void PopulateMapWithKrits(int amount) {
   for (int i = 0; i < amount; i++) { CreateRandomKrit(); }
+}
+
+void DeleteKrit(int x, int y) {
+  for (size_t k = 0; k < krits.size(); k++) {
+    if (x == krits[k].position.x && y == krits[k].position.y) { krits.erase(krits.begin() + k); }
+  }
+}
+
+bool CheckKrit(int x, int y) {
+  for (size_t k = 0; k < krits.size(); k++) {
+    if (x == krits[k].position.x && y == krits[k].position.y) { return true; }
+  }
+  return false;
 }
