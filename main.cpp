@@ -4,31 +4,77 @@
 #include <fstream>
 #include <string>
 #include "include/cursor.h"
+#include "include/globals.h"
 #include "include/krit.h"
 #include "include/map.h"
+#define RAYGUI_IMPLEMENTATION
+#include "include/raygui.h"
 #include "include/raylib.h"
-#include "include/globals.h"
 
 using namespace std;
 
-bool debug = false;
 float tile_size = 16;
 vector<string> tileMap;
 Krit* currentKrit = nullptr;
 Cursor cursor = Cursor({4, 4}, {tile_size - 1, tile_size - 1});
 
+// DEBUG
+bool debug = false;
+bool showRes = false;
+float value = 0.5f;
+
 void CheckPattern() {
-  // TODO: Check for any direction
-  int count = 0;
+  // TODO Check for any direction
+  int min_x = 0;
+  int max_x = 0;
+  int min_y = 0;
+  int max_y = 0;
+
+  // Check diagonal
+
+  // Check horizontal
   for (int i = 0; i < INFINITY; i++) {
-    if (CheckKrit(cursor.position.x + i, cursor.position.y)) {
-      count++;
+    if (CheckKrit(cursor.position.x - i, cursor.position.y)) {
+      min_x--;
     } else {
       break;
     }
   }
-  if (count >= 3) {
-    for (int i = 0; i < count; i++) { DeleteKrit(cursor.position.x + i, cursor.position.y); }
+
+  for (int i = 0; i < INFINITY; i++) {
+    if (CheckKrit(cursor.position.x + i, cursor.position.y)) {
+      max_x++;
+    } else {
+      break;
+    }
+  }
+
+  int dist_x = abs(min_x) + max_x;
+
+  // Check vertical
+  for (int i = 0; i < INFINITY; i++) {
+    if (CheckKrit(cursor.position.x, cursor.position.y + i)) {
+      max_y++;
+    } else {
+      break;
+    }
+  }
+
+  for (int i = 0; i < INFINITY; i++) {
+    if (CheckKrit(cursor.position.x, cursor.position.y - i)) {
+      min_y--;
+    } else {
+      break;
+    }
+  }
+
+  int dist_y = abs(min_y) + max_y;
+
+  if (dist_y >= 4) {
+    for (int i = min_y; i < max_y; i++) { DeleteKrit(cursor.position.x, cursor.position.y + i); }
+  }
+  if (dist_x >= 4) {
+    for (int i = min_x; i < max_x; i++) { DeleteKrit(cursor.position.x + i, cursor.position.y); }
   }
 }
 
@@ -74,6 +120,8 @@ int main(void) {
   PopulateMapWithKrits(10);
 
   Vector2 grid_offset = {5, 8};
+
+  GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
 
   // MAIN GAME LOOP //
   while (!WindowShouldClose()) {
@@ -147,10 +195,10 @@ int main(void) {
       DrawRectangle(position.x, position.y, krit.size.x, krit.size.y - 1, krit.color);
     }
 
-    Rectangle cursorRec = {cursor.position.x * tile_size + grid_offset.x,
-                           cursor.position.y * tile_size + grid_offset.y,
-                           cursor.size.x,
-                           cursor.size.y
+    Rectangle cursorRec = { cursor.position.x * tile_size + grid_offset.x,
+                            cursor.position.y * tile_size + grid_offset.y,
+                            cursor.size.x,
+                            cursor.size.y
     };
 
     DrawRectangleRoundedLinesEx(cursorRec, 0.1f, 16.0f, 1.0f + fabs(sin(dt * 5.0f)), RED);
@@ -166,8 +214,11 @@ int main(void) {
     EndMode2D();
 
     if (debug) {
-      DrawText(TextFormat("Screen resolution: %ix%i", screenWidth, screenHeight), 10, 10, 20, DARKBLUE);
-      DrawText(TextFormat("World resolution: %ix%i", virtualScreenWidth, virtualScreenHeight), 10, 40, 20, DARKGREEN);
+      if (GuiButton((Rectangle){16, 16, 256, 32}, "#191#Show resolution")) { showRes = !showRes; }
+      if (showRes) {
+        DrawText(TextFormat("Screen resolution: %ix%i", screenWidth, screenHeight), 16, 48, 20, DARKBLUE);
+        DrawText(TextFormat("World resolution: %ix%i", virtualScreenWidth, virtualScreenHeight), 16, 80, 20, DARKGREEN);
+      }
       DrawFPS(GetScreenWidth() - 95, 10);
     }
 
