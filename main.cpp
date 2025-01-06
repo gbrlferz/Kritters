@@ -23,61 +23,6 @@ bool debug = false;
 bool showRes = false;
 float value = 0.5f;
 
-void CheckPattern() {
-  // TODO Check for any direction
-  int min_x = 0;
-  int max_x = 0;
-  int min_y = 0;
-  int max_y = 0;
-
-  // Check diagonal
-
-  // Check horizontal
-  for (int i = 0; i < INFINITY; i++) {
-    if (CheckKrit(cursor.position.x - i, cursor.position.y)) {
-      min_x--;
-    } else {
-      break;
-    }
-  }
-
-  for (int i = 0; i < INFINITY; i++) {
-    if (CheckKrit(cursor.position.x + i, cursor.position.y)) {
-      max_x++;
-    } else {
-      break;
-    }
-  }
-
-  int dist_x = abs(min_x) + max_x;
-
-  // Check vertical
-  for (int i = 0; i < INFINITY; i++) {
-    if (CheckKrit(cursor.position.x, cursor.position.y + i)) {
-      max_y++;
-    } else {
-      break;
-    }
-  }
-
-  for (int i = 0; i < INFINITY; i++) {
-    if (CheckKrit(cursor.position.x, cursor.position.y - i)) {
-      min_y--;
-    } else {
-      break;
-    }
-  }
-
-  int dist_y = abs(min_y) + max_y;
-
-  if (dist_y >= 4) {
-    for (int i = min_y; i < max_y; i++) { DeleteKrit(cursor.position.x, cursor.position.y + i); }
-  }
-  if (dist_x >= 4) {
-    for (int i = min_x; i < max_x; i++) { DeleteKrit(cursor.position.x + i, cursor.position.y); }
-  }
-}
-
 int main(void) {
   // INITIALIZATION //
   ifstream file("resources/level.txt");
@@ -157,7 +102,7 @@ int main(void) {
       // Deselect krit
       if (currentKrit && TileEmpty(cursor.position.x, cursor.position.y)) {
         currentKrit = nullptr;
-        CheckPattern();
+        CheckPattern(cursor.position);
       }
       // Select krit
       else {

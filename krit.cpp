@@ -1,9 +1,10 @@
+#include "include/krit.h"
+#include <cmath>
 #include <cstddef>
 #include <vector>
-#include "include/raylib.h"
-#include "include/krit.h"
-#include "include/map.h"
 #include "include/globals.h"
+#include "include/map.h"
+#include "include/raylib.h"
 using namespace std;
 
 vector<Krit> krits;
@@ -44,4 +45,52 @@ bool CheckKrit(int x, int y) {
     if (x == krits[k].position.x && y == krits[k].position.y) { return true; }
   }
   return false;
+}
+
+void CheckPattern(Vector2 pos) {
+  int min_x = 0;
+  int max_x = 0;
+  int min_y = 0;
+  int max_y = 0;
+
+  // Check horizontal
+  for (int i = 0; i < INFINITY; i++) {
+    if (CheckKrit(pos.x - i, pos.y)) {
+      min_x--;
+    } else { break; }
+  }
+
+  for (int i = 0; i < INFINITY; i++) {
+    if (CheckKrit(pos.x + i, pos.y)) {
+      max_x++;
+    } else { break; }
+  }
+
+  int dist_x = abs(min_x) + max_x;
+
+  // Check vertical
+  for (int i = 0; i < INFINITY; i++) {
+    if (CheckKrit(pos.x, pos.y + i)) {
+      max_y++;
+    } else { break; }
+  }
+
+  for (int i = 0; i < INFINITY; i++) {
+    if (CheckKrit(pos.x, pos.y - i)) {
+      min_y--;
+    } else { break; }
+  }
+
+  int dist_y = abs(min_y) + max_y;
+
+  if (dist_y >= 4) {
+    for (int i = min_y; i < max_y; i++) {
+      DeleteKrit(pos.x, pos.y + i);
+    }
+  }
+  if (dist_x >= 4) {
+    for (int i = min_x; i < max_x; i++) {
+      DeleteKrit(pos.x + i, pos.y);
+    }
+  }
 }
