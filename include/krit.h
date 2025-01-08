@@ -19,6 +19,6 @@ void CreateRandomKrit();
 void PopulateMapWithKrits(int amount);
 void DeleteKrit(int x, int y);
 bool CheckKrit(int x, int y);
-void CheckPattern(Vector2 pos);
+int CheckPattern(Vector2 pos);
 
 #endif

@@ -47,8 +47,12 @@ bool CheckKrit(int x, int y) {
   return false;
 }
 
-void CheckPattern(Vector2 pos) {
+int CheckPattern(Vector2 pos) {
   // TODO: Simplify
+
+  bool xPatternMade = false;
+  bool yPatternMade = false;
+
   int min_x = 0;
   int max_x = 0;
   int min_y = 0;
@@ -88,10 +92,23 @@ void CheckPattern(Vector2 pos) {
     for (int i = min_y; i < max_y; i++) {
       DeleteKrit(pos.x, pos.y + i);
     }
+    yPatternMade = true;
   }
   if (dist_x >= 4) {
     for (int i = min_x; i < max_x; i++) {
       DeleteKrit(pos.x + i, pos.y);
     }
+    xPatternMade = true;
+  }
+
+  if (xPatternMade && yPatternMade) {
+    int points = dist_x + dist_y - 3;
+    return points * 10 * points;
+  } else if (xPatternMade) {
+    return (dist_x - 1) * 10;
+  } else if (yPatternMade) {
+    return (dist_y - 1) * 10;
+  } else {
+    return 0;
   }
 }

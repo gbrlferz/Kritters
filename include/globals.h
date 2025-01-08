@@ -5,5 +5,6 @@
 #include "krit.h" // Ensure this includes the Krit class definition
 
 extern Krit* currentKrit;
+extern int TILE_SIZE;
 
 #endif
