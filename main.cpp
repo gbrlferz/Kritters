@@ -1,7 +1,6 @@
 #include <math.h>
 #include <cstddef>
 #include <cstdlib>
-#include <string>
 #include "include/cursor.h"
 #include "include/globals.h"
 #include "include/krit.h"
@@ -21,19 +20,19 @@ bool showRes = false;
 float value = 0.5f;
 
 int score = 0;
-void AddPoints(int points) { score += points; }
 
 int TILE_SIZE = 16;
 
+void AddPoints(int points) { score += points; }
+
 int main(void) {
   // INITIALIZATION //
-  // Screen
   const float ratio = 4.0 / 3.0;
   const int resolution = 720;
   const int screenWidth = resolution * ratio;
   const int screenHeight = resolution;
 
-  const int virtualScreenWidth = 180 * ratio;
+  const int virtualScreenWidth = 240;
   const int virtualScreenHeight = 180;
 
   const float virtualRatio = (float)screenWidth / (float)virtualScreenWidth;
@@ -57,6 +56,8 @@ int main(void) {
   Rectangle sourceRec = {0.0f, 0.0f, (float)target.texture.width, -(float)target.texture.height};
   Rectangle destRec = {-virtualRatio, -virtualRatio, screenWidth + (virtualRatio * 2), screenHeight + (virtualRatio * 2)};
 
+  Texture2D titleScreen = LoadTexture("resources/title_screen.png");
+
   Vector2 origin = {0.0f, 0.0f};
 
   float dt = 0.0f;
@@ -66,13 +67,12 @@ int main(void) {
 
   PopulateMapWithKrits(10);
 
-
   // MAIN GAME LOOP //
   while (!WindowShouldClose()) {
+    if (IsKeyPressed(KEY_GRAVE)) { debug = !debug; }
     // UPDATE //
     switch (currentScreen) {
       case LOGO: {
-        // TODO: Update LOGO screen variables here!
         framesCounter++;  // Count frames
         if (framesCounter > 120) { currentScreen = TITLE; }
       } break;
@@ -121,8 +121,6 @@ int main(void) {
       } break;
     }
 
-    if (IsKeyPressed(KEY_GRAVE)) { debug = !debug; }
-
     // DRAW
     BeginTextureMode(target);
     ClearBackground(BLACK);
@@ -133,8 +131,7 @@ int main(void) {
         DrawText("Gabiru", 20, 20, 20, LIGHTGRAY);
       } break;
       case TITLE: {
-        DrawText("TITLE SCREEN", 20, 20, 20, DARKGREEN);
-        DrawText("PRESS ENTER or TAP to JUMP to GAMEPLAY SCREEN", 20, 40, 10, DARKGREEN);
+        DrawTexture(titleScreen, 0, 0, WHITE);
       } break;
       case GAMEPLAY: {
         DrawMap();
