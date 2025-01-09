@@ -56,6 +56,7 @@ int main(void) {
   Rectangle sourceRec = {0.0f, 0.0f, (float)target.texture.width, -(float)target.texture.height};
   Rectangle destRec = {-virtualRatio, -virtualRatio, screenWidth + (virtualRatio * 2), screenHeight + (virtualRatio * 2)};
 
+  Texture2D logo = LoadTexture("resources/gabiru.png");
   Texture2D titleScreen = LoadTexture("resources/title_screen.png");
 
   Vector2 origin = {0.0f, 0.0f};
@@ -69,8 +70,10 @@ int main(void) {
 
   // MAIN GAME LOOP //
   while (!WindowShouldClose()) {
-    if (IsKeyPressed(KEY_GRAVE)) { debug = !debug; }
     // UPDATE //
+
+    if (IsKeyPressed(KEY_GRAVE)) { debug = !debug; }
+
     switch (currentScreen) {
       case LOGO: {
         framesCounter++;  // Count frames
@@ -128,7 +131,7 @@ int main(void) {
 
     switch (currentScreen) {
       case LOGO: {
-        DrawText("Gabiru", 20, 20, 20, LIGHTGRAY);
+        DrawTexture(logo, 0, 0, WHITE);
       } break;
       case TITLE: {
         DrawTexture(titleScreen, 0, 0, WHITE);
