@@ -20,5 +20,6 @@ void PopulateMapWithKrits(int amount);
 void DeleteKrit(int x, int y);
 bool CheckKrit(int x, int y);
 int CheckPattern(Vector2 pos);
+void DrawKrits();
 
 #endif

@@ -8,6 +8,8 @@
 #define RAYGUI_IMPLEMENTATION
 #include "include/raygui.h"
 #include "include/raylib.h"
+#define GUI_DEBUG_IMPLEMENTATION
+#include "include/gui_debug.h"
 using namespace std;
 
 typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY } GameScreen;
@@ -39,6 +41,10 @@ int main(void) {
 
   InitWindow(screenWidth, screenHeight, "Krazy Kreatures");
 
+  GuiLoadStyle("resources/lavanda.rgs");
+
+  GuiDebugState state = InitGuiDebug();
+
   InitMap();
 
   GameScreen currentScreen = LOGO;
@@ -62,7 +68,8 @@ int main(void) {
   Vector2 origin = {0.0f, 0.0f};
 
   float dt = 0.0f;
-  float spawnTime = 0.0f;
+  float time = 0.0f;
+  float spawnTime = 1.0f;
 
   SetTargetFPS(60);
 
@@ -84,11 +91,12 @@ int main(void) {
       } break;
       case GAMEPLAY: {
         dt += GetFrameTime();
-        spawnTime += GetFrameTime();
+        time += GetFrameTime();
 
-        if (spawnTime >= 1.0f) {
+        if (time >= spawnTime && spawnTime > 0.0f) {
           CreateRandomKrit();
-          spawnTime = 0.0f;
+          spawnTime -= 0.005f;
+          time = 0.0f;
         }
 
         if (currentKrit) { currentKrit->position = cursor.position; }
@@ -138,15 +146,11 @@ int main(void) {
       } break;
       case GAMEPLAY: {
         DrawMap();
-        for (size_t k = 0; k < krits.size(); k++) {
-          Krit krit = krits[k];
-          Vector2 position = {krit.position.x * TILE_SIZE + grid_offset.x, krit.position.y * TILE_SIZE + grid_offset.y};
-          DrawRectangle(position.x, position.y, krit.size.x, krit.size.y - 1, krit.color);
-        }
+        DrawKrits();
         Rectangle cursorRec = {cursor.position.x * TILE_SIZE + grid_offset.x, cursor.position.y * TILE_SIZE + grid_offset.y, cursor.size.x,
                                cursor.size.y};
         DrawRectangleRoundedLinesEx(cursorRec, 0.1f, 16.0f, 1.0f + fabs(sin(dt * 5.0f)), RED);
-        DrawText(TextFormat("Score: %i", score), 4, 4, 4, DARKBLUE);
+        GuiLabel({4, 4, 64, 16}, TextFormat("#146#Score: %i", score));
       } break;
     }
 
@@ -161,12 +165,7 @@ int main(void) {
     EndMode2D();
 
     if (debug) {
-      if (GuiButton((Rectangle){16, 16, 256, 32}, "#191#Show resolution")) { showRes = !showRes; }
-      if (showRes) {
-        DrawText(TextFormat("Screen resolution: %ix%i", screenWidth, screenHeight), 16, 48, 20, DARKBLUE);
-        DrawText(TextFormat("World resolution: %ix%i", virtualScreenWidth, virtualScreenHeight), 16, 80, 20, DARKGREEN);
-      }
-      DrawFPS(GetScreenWidth() - 95, 10);
+      GuiDebug(&state);
     }
 
     EndDrawing();

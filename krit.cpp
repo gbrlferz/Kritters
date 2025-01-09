@@ -20,11 +20,15 @@ bool TileEmpty(int x, int y) {
 }
 
 void CreateRandomKrit() {
+  Color pink = GetColor(0xfe626eFF);
+  Color B5 = GetColor(0xa4f022FF);
+  vector<Color> colors = {pink, B5};
   while (true) {
     int x = rand() % tileMap[0].size();
     int y = rand() % tileMap.size();
     if (TileEmpty(x, y)) {
-      krits.push_back(Krit({static_cast<float>(x), static_cast<float>(y)}, MAROON));
+      int kritColor = rand() % colors.size();
+      krits.push_back(Krit({static_cast<float>(x), static_cast<float>(y)}, colors[kritColor]));
       break;
     }
   }
@@ -110,5 +114,13 @@ int CheckPattern(Vector2 pos) {
     return (dist_y - 1) * 10;
   } else {
     return 0;
+  }
+}
+
+void DrawKrits() {
+  for (size_t k = 0; k < krits.size(); k++) {
+    Krit krit = krits[k];
+    Vector2 position = {krit.position.x * TILE_SIZE + grid_offset.x, krit.position.y * TILE_SIZE + grid_offset.y};
+    DrawRectangle(position.x, position.y, krit.size.x, krit.size.y - 1, krit.color);
   }
 }
