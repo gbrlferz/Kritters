@@ -8,8 +8,9 @@ struct Krit {
   Vector2 position;
   Vector2 size = {15, 16};
   Color color;
+  int type;
   // Constructor
-  Krit(Vector2 pos, Color clr) : position(pos), color(clr) {}
+  Krit(Vector2 pos, Color clr, int tp) : position(pos), color(clr), type(tp) {}
 };
 
 extern std::vector<Krit> krits;

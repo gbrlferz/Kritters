@@ -11,9 +11,7 @@ vector<Krit> krits;
 
 bool TileEmpty(int x, int y) {
   if (tileMap[y][x] != '.') { return false; } // Return false if space is not empty
-
-  for (const auto& krit : krits) {
-    // Return false if a krit is already there
+  for (const auto& krit : krits) {            // Return false if a krit is already there
     if (&krit != currentKrit && x == krit.position.x && y == krit.position.y) { return false; }
   }
   return true;
@@ -28,7 +26,7 @@ void CreateRandomKrit() {
     int y = rand() % tileMap.size();
     if (TileEmpty(x, y)) {
       int kritColor = rand() % colors.size();
-      krits.push_back(Krit({static_cast<float>(x), static_cast<float>(y)}, colors[kritColor]));
+      krits.push_back(Krit({static_cast<float>(x), static_cast<float>(y)}, colors[kritColor], kritColor));
       break;
     }
   }
@@ -46,7 +44,7 @@ void DeleteKrit(int x, int y) {
 
 bool CheckKrit(int x, int y) {
   for (size_t k = 0; k < krits.size(); k++) {
-    if (x == krits[k].position.x && y == krits[k].position.y) { return true; }
+    if ((x == krits[k].position.x && y == krits[k].position.y) && krits[k].type == currentKrit->type) { return true; }
   }
   return false;
 }

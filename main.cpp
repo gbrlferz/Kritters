@@ -41,7 +41,7 @@ int main(void) {
 
   InitWindow(screenWidth, screenHeight, "Krazy Kreatures");
 
-  GuiLoadStyle("resources/lavanda.rgs");
+  GuiLoadStyle("resources/style.rgs");
 
   GuiDebugState state = InitGuiDebug();
 
@@ -119,8 +119,8 @@ int main(void) {
         if (IsKeyPressed(KEY_Z)) {
           // Deselect krit
           if (currentKrit && TileEmpty(cursor.position.x, cursor.position.y)) {
-            currentKrit = nullptr;
             AddPoints(CheckPattern(cursor.position));
+            currentKrit = nullptr;
           }
           // Select krit
           else {
@@ -150,7 +150,8 @@ int main(void) {
         Rectangle cursorRec = {cursor.position.x * TILE_SIZE + grid_offset.x, cursor.position.y * TILE_SIZE + grid_offset.y, cursor.size.x,
                                cursor.size.y};
         DrawRectangleRoundedLinesEx(cursorRec, 0.1f, 16.0f, 1.0f + fabs(sin(dt * 5.0f)), RED);
-        GuiLabel({4, 4, 64, 16}, TextFormat("#146#Score: %i", score));
+        GuiLabel({4, 2, 32, 8}, TextFormat("%i", score));
+        GuiLabel({4, 14, 32, 8}, TextFormat("%i", static_cast<int>(dt)));
       } break;
     }
 
