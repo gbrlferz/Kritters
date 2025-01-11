@@ -11,7 +11,7 @@ vector<string> tileMap;
 int MAP_ROWS;
 int MAP_COLS;
 
-Vector2 grid_offset = {5, 8};
+Vector2 grid_offset = {0, 0};
 
 void InitMap() {
   ifstream file("resources/level.txt");
@@ -21,6 +21,9 @@ void InitMap() {
   // Calculate map dimensions
   MAP_ROWS = tileMap.size();
   MAP_COLS = tileMap[0].size();
+
+  grid_offset.x = (240.0 / 2.0) - ((float)MAP_COLS * 16 / 2);
+  grid_offset.y = (180.0 / 2.0) - ((float)MAP_ROWS * 16 / 2);
 }
 
 void DrawMap() {

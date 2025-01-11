@@ -34,8 +34,8 @@ int main(void) {
   const int screenWidth = resolution * ratio;
   const int screenHeight = resolution;
 
-  const int virtualScreenWidth = 240;
-  const int virtualScreenHeight = 180;
+  int virtualScreenWidth = 240;
+  int virtualScreenHeight = 180;
 
   const float virtualRatio = (float)screenWidth / (float)virtualScreenWidth;
 
@@ -155,6 +155,8 @@ int main(void) {
       } break;
     }
 
+    if (debug) { GuiDebug(&state); }
+
     EndMode2D();
     EndTextureMode();
 
@@ -164,10 +166,6 @@ int main(void) {
     DrawTexturePro(target.texture, sourceRec, destRec, origin, 0.0f, WHITE);
 
     EndMode2D();
-
-    if (debug) {
-      GuiDebug(&state);
-    }
 
     EndDrawing();
   }

@@ -2,7 +2,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include "krit.h" // Ensure this includes the Krit class definition
+#include "krit.h"
 
 extern Krit* currentKrit;
 extern int TILE_SIZE;
